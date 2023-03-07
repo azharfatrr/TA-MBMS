@@ -1,89 +1,119 @@
 import Joi from '@hapi/joi';
 
-const joiText = Joi.string().min(3).max(100).required();
-const joiLongText = Joi.string().min(3).max(1500).required();
-const joiArrayOfString = Joi.array().items(Joi.string());
+export const joiText = Joi.string().min(3).max(100).required();
+export const joiLongText = Joi.string().min(3).max(1500).required();
+export const joiArrayOfString = Joi.array().items(Joi.string());
+export const joiVisualization = Joi.object().keys({
+  'style': Joi.string().required(),
+  'geometry': Joi.object().required().keys({
+    'x': Joi.number().required(),
+    'y': Joi.number().required(),
+    'width': Joi.number().required(),
+    'height': Joi.number().required(),
+  }),
+});
 
-const schema = Joi.object().keys({
+const joiCriterions = Joi.object().required().keys({
+  'alphas': joiArrayOfString,
+  'workProducts': joiArrayOfString,
+});
+const joiActivities = Joi.array().required().items(
+  Joi.object().keys({
+    'nameId': joiText,
+    'name': joiText,
+    'description': joiLongText,
+    'visualization': joiVisualization,
+    'completionCriterions': joiCriterions,
+    'entryCriterions': joiCriterions,
+    'competencies': joiArrayOfString,
+  })
+);
+const joiActivitySpaces = Joi.array().required().items(
+  Joi.object().keys({
+    'nameId': joiText,
+    'name': joiText,
+    'description': joiLongText,
+    'visualization': joiVisualization,
+    'activities': joiActivities,
+  })
+);
+
+const joiWorkProducts = Joi.array().items(
+  Joi.object().keys({
+    'nameId': joiText,
+    'name': joiText,
+    'description': joiLongText,
+    'visualization': joiVisualization,
+    'levelOfDetails': joiArrayOfString,
+  })
+);
+const joiAlphaStates = Joi.array().required().items(
+  Joi.object().keys({
+    'nameId': joiText,
+    'name': joiText,
+    'description': joiLongText,
+    'checklists': joiArrayOfString,
+  })
+);
+const joiAlphas = Joi.array().required().items(
+  Joi.object().keys({
+    'nameId': joiText,
+    'name': joiText,
+    'description': joiLongText,
+    'visualization': joiVisualization,
+    'workProducts': joiWorkProducts,
+    'states': joiAlphaStates,
+    'subalphaIds': joiArrayOfString,
+  })
+);
+
+const joiCompetencyLevels = Joi.array().required().items(
+  Joi.object().keys({
+    'name': joiText,
+    'description': joiLongText,
+  })
+);
+const joiCompetencies = Joi.array().required().items(
+  Joi.object().keys({
+    'nameId': joiText,
+    'name': joiText,
+    'description': joiLongText,
+    'visualization': joiVisualization,
+    'levels': joiCompetencyLevels,
+  })
+);
+
+const joiPatterns = Joi.array().required().items(
+  Joi.object().keys({
+    'name': joiText,
+    'nameId': joiText,
+    'description': joiLongText,
+    'alphas': joiArrayOfString,
+    'activities': joiArrayOfString,
+    'competencies': joiArrayOfString,
+    'subpatternIds': joiArrayOfString,
+  })
+);
+
+
+const joiMethodChunk = Joi.object().keys({
   'nameId': joiText,
   'name': joiText,
   'description': joiLongText,
-  'characteristics': Joi.array().required().items(Joi.object()),
-  'activitySpaces': Joi.array().required().items(
+  'characteristics': Joi.array().required().items(
     Joi.object().keys({
-      'nameId': joiText,
-      'name': joiText,
-      'description': joiLongText,
-      'activities': Joi.array().required().items(
-        Joi.object().keys({
-          'nameId': joiText,
-          'name': joiText,
-          'description': joiLongText,
-          'completionCriterions': Joi.object().required().keys({
-            'alphas': joiArrayOfString,
-            'workProducts': joiArrayOfString,
-          }),
-          'entryCriterions': Joi.object().required().keys({
-            'alphas': joiArrayOfString,
-            'workProducts': joiArrayOfString,
-          }),
-          'competencies': joiArrayOfString,
-        })
-      ),
-    }),
-  ),
-  'alphas': Joi.array().required().items(
-    Joi.object().keys({
-      'nameId': joiText,
-      'name': joiText,
-      'description': joiLongText,
-      'workProducts': Joi.array().items(
-        Joi.object().keys({
-          'nameId': joiText,
-          'name': joiText,
-          'description': joiLongText,
-          'levelOfDetails': joiArrayOfString,
-        }),
-      ),
-      'states': Joi.array().required().items(
-        Joi.object().keys({
-          'nameId': joiText,
-          'name': joiText,
-          'description': joiLongText,
-          'checklists': joiArrayOfString,
-        }),
-      ),
-      'subalphaIds': joiArrayOfString,
+      'characteristic': joiLongText,
+      'value': joiText,
     })
   ),
-  'competencies': Joi.array().required().items(
-    Joi.object().keys({
-      'nameId': joiText,
-      'name': joiText,
-      'description': joiLongText,
-      'levels': Joi.array().required().items(
-        Joi.object().keys({
-          'name': joiText,
-          'description': joiLongText,
-        }),
-      ),
-    }),
-  ),
-  'patterns': Joi.array().required().items(
-    Joi.object().keys({
-      'name': joiText,
-      'nameId': joiText,
-      'description': joiLongText,
-      'alphas': joiArrayOfString,
-      'activities': joiArrayOfString,
-      'competencies': joiArrayOfString,
-      'subpatternIds': joiArrayOfString,
-    }),
-  ),
+  'activitySpaces': joiActivitySpaces,
+  'alphas': joiAlphas,
+  'competencies': joiCompetencies,
+  'patterns': joiPatterns,
 });
 
 export const isMethodChunkValid = (methodChunk) => {
-  const result = Joi.validate(methodChunk, schema);
+  const result = Joi.validate(methodChunk, joiMethodChunk);
   console.log(result.error);
   const message = result.error && result.error.details[0].message;
   return message;

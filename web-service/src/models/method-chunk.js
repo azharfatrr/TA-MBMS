@@ -11,6 +11,16 @@ const StringRequiredUnique = {
   uniqute: true,
 };
 
+const VisualizationSchema = new Schema({
+  'style': String,
+  'geometry': {
+    'x': Number,
+    'y': Number,
+    'width': Number,
+    'height': Number,
+  },
+});
+
 export const MethodChunkSchema = new Schema(
   {
     'nameId': StringAndRequired,
@@ -30,11 +40,13 @@ export const MethodChunkSchema = new Schema(
         'nameId': StringAndRequired,
         'name': StringAndRequired,
         'description': StringAndRequired,
+        'visualization': VisualizationSchema,
         'activities': [
           {
             'nameId': StringRequiredUnique,
             'name': StringAndRequired,
             'description': StringAndRequired,
+            'visualization': VisualizationSchema,
             'completionCriterions': {
               'alphas': [String],
               'workProducts': [String],
@@ -53,11 +65,13 @@ export const MethodChunkSchema = new Schema(
         'nameId': StringRequiredUnique,
         'name': StringAndRequired,
         'description': StringAndRequired,
+        'visualization': VisualizationSchema,
         'workProducts': [
           {
             'nameId': StringRequiredUnique,
             'name': StringAndRequired,
             'description': StringAndRequired,
+            'visualization': VisualizationSchema,
             'levelOfDetails': [String],
           },
         ],
@@ -77,6 +91,7 @@ export const MethodChunkSchema = new Schema(
         'nameId': StringRequiredUnique,
         'name': StringAndRequired,
         'description': StringAndRequired,
+        'visualization': VisualizationSchema,
         'levels': [
           {
             'name': StringAndRequired,
