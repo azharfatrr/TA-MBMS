@@ -8,6 +8,7 @@ import { errorCode } from '../constants';
 
 exports.login = async (req, res, next) => {
   try {
+    console.log(req.body);
     const data = req.body || {};
 
     if (!data.username || !data.password) {

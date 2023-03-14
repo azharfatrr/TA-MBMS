@@ -45,6 +45,12 @@ api.listen(config.server.port, err => {
     res.send('Welcome to Method Base Management System');
   });
 
+  api.use((req, res, next) => {
+    const err = new Error('Path not found');
+    err.status = 404;
+    next(err);
+  });
+
   api.use(errorHandler);
 
   logger.info(

@@ -48,6 +48,7 @@ export default (err, req, res, next) => {
       message: errorCode.NotAuthorized,
     });
   }
+
   logger.error(err.stack);
   res.status(500).send({
     status: 'error',

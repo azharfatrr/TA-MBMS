@@ -87,7 +87,7 @@ exports.delete = async (req, res, next) => {
 exports.edit = async (req, res, next) => {
   try {
     const { username } = req.user;
-    const data = req.body || {};
+    let data = req.body || {};
 
     const errorMsgMethodInvalid = isMethodChunkValid(data);
     if (errorMsgMethodInvalid) {
@@ -96,13 +96,19 @@ exports.edit = async (req, res, next) => {
 
     const { nameId } = data;
     const methodChunk = await MethodChunk.findOne({ nameId });
-    if (!methodChunk) throw new Error(errorCode.MethodChunkNotFound);
+    if (!methodChunk) {
+      data = {
+        ...data,
+        creator: username,
+        published: false,
+      };
+    }
 
-    if (username !== methodChunk['creator']) {
+    if (methodChunk && methodChunk['creator'] !== username) {
       throw new Error(errorCode.NotAuthorized);
     }
 
-    await MethodChunk.updateOne({ nameId }, data);
+    await MethodChunk.updateOne({ nameId }, data, { upsert: true });
     res.json({
       status: 'success',
     });
