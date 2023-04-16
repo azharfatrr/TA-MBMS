@@ -6,6 +6,7 @@ module.exports = api => {
   api.route('/method-chunk/:name_id').get(MethodChunk.getOne);
   api.route('/method-chunk').post(authMiddleware, MethodChunk.insert);
   api.route('/method-chunk').put(authMiddleware, MethodChunk.edit);
+  api.route('/method-chunk/header').put(authMiddleware, MethodChunk.editHeader);
   api.route('/method-chunk/:name_id').delete(authMiddleware, MethodChunk.delete);
   api.route('/method-chunk/publish/:name_id').post(MethodChunk.publish);
 };

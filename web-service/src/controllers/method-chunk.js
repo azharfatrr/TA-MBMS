@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 
 import MethodChunk from '../models/method-chunk';
-import { isMethodChunkValid } from '../utils/method-chunk';
+import { isMethodChunkHeaderValid, isMethodChunkValid } from '../utils/method-chunk';
 import { errorCode } from '../constants';
 import Config from '../config';
 
@@ -109,6 +109,35 @@ exports.edit = async (req, res, next) => {
     }
 
     await MethodChunk.updateOne({ nameId }, data, { upsert: true });
+    res.json({
+      status: 'success',
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.editHeader = async (req, res, next) => {
+  try {
+    const { username } = req.user;
+    const data = req.body || {};
+
+    const errorMsgMethodInvalid = isMethodChunkHeaderValid(data);
+    if (errorMsgMethodInvalid) {
+      throw new Error(errorMsgMethodInvalid);
+    }
+
+    const { nameId } = data;
+    const methodChunk = await MethodChunk.findOne({ nameId });
+    if (!methodChunk) {
+      throw new Error(errorCode.MethodChunkNotFound);
+    }
+
+    if (methodChunk && methodChunk['creator'] !== username) {
+      throw new Error(errorCode.NotAuthorized);
+    }
+
+    await MethodChunk.updateOne({ nameId }, data);
     res.json({
       status: 'success',
     });

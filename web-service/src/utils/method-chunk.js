@@ -95,7 +95,6 @@ const joiPatterns = Joi.array().required().items(
   })
 );
 
-
 const joiMethodChunk = Joi.object().keys({
   'nameId': joiText,
   'name': joiText,
@@ -111,6 +110,24 @@ const joiMethodChunk = Joi.object().keys({
   'competencies': joiCompetencies,
   'patterns': joiPatterns,
 });
+
+const joiMethodChunkHeader = Joi.object().keys({
+  'nameId': joiText,
+  'name': joiText,
+  'description': joiLongText,
+  'characteristics': Joi.array().required().items(
+    Joi.object().keys({
+      'characteristic': joiLongText,
+      'value': joiText,
+    })
+  ),
+});
+export const isMethodChunkHeaderValid = (methodChunkHeader) => {
+  const result = Joi.validate(methodChunkHeader, joiMethodChunkHeader);
+  console.log(result.error);
+  const message = result.error && result.error.details[0].message;
+  return message;
+};
 
 export const isMethodChunkValid = (methodChunk) => {
   const result = Joi.validate(methodChunk, joiMethodChunk);
