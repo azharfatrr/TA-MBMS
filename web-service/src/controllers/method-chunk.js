@@ -181,3 +181,44 @@ exports.publish = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.clone = async (req, res, next) => {
+  try {
+    const nameId = req.params.name_id;
+
+    const newNameId = req.body.nameId;
+    const newName = req.body.name;
+
+    // Validate that body contains nameId.
+    if (!newNameId) {
+      throw new Error(errorCode.InvalidMethodChunk);
+    }
+
+    // Validate that nameId is not already taken.
+    const possibleDuplicate = await MethodChunk.findOne({ ['nameId']: newNameId });
+    if (possibleDuplicate) throw new Error(errorCode.MethodChunkAlreadyExists);
+
+    // Get MethodChunk from database.
+    let data = await MethodChunk.findOne({ ['nameId']: nameId });
+
+    // Remove _id and __v.
+    data = data.toObject();
+    delete data._id;
+    delete data.__v;
+
+    // Set creator and published.
+    data.creator = req.user.username;
+    data.published = false;
+
+    // Update name and nameId.
+    data.nameId = newNameId || data.nameId;
+    data.name = newName || data.name;
+
+    await MethodChunk.create(data);
+    res.json({
+      status: 'success',
+    });
+  } catch (err) {
+    next(err);
+  }
+};
